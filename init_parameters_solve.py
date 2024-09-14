@@ -160,8 +160,8 @@ for i in range(num_unknows):
     cols = st.columns([1, 1, 1, 1])
     bc_data[i][0] = cols[0].selectbox(label='Участок'+str(i), options=[i for i in range(num_elems)], label_visibility='collapsed')
     bc_data[i][1] = cols[1].selectbox(label='Функция'+str(i), options=['Прогиб', 'Угол', 'Момент', 'Сила'], label_visibility='collapsed')
-    bc_data[i][2] = cols[2].number_input(label='Координата'+str(i), value=x_val[bc_data[i][0]+1], label_visibility='collapsed')
-    bc_data[i][3] = cols[3].number_input(label='Значение'+str(i), value=0.0, label_visibility='collapsed')
+    bc_data[i][2] = cols[2].text_input(label='Координата'+str(i), value=str(x_val[bc_data[i][0]+1]), label_visibility='collapsed')
+    bc_data[i][3] = cols[3].text_input(label='Значение'+str(i), value='0', label_visibility='collapsed')
 
 
 #Фукция генерирующая граничное условие
