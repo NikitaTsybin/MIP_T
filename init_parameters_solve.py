@@ -13,20 +13,22 @@ st.write('Ниже записано общее решение уравнения
 st.write('''$EI \\cdot v_i(x) = EI \\cdot v_{i-1}(x) + EI \\cdot \\Delta v_{i-1} + EI \\cdot \\Delta \\varphi \\cdot (x - x_i) - \\dfrac{\\Delta M \\cdot (x - x_i)^2}{2!} - \\dfrac{\\Delta Q \\cdot (x - x_i)^3}{3!} +  \\dfrac{(q_i - q_{i-1}) \\cdot (x - x_i)^4}{4!} $''')
 
 init_data = pd.DataFrame([
-        {'xi': 0.0, 'dv*EI': '0',  'dφ*EI': '!',    'dM': '0', 'dQ': '!',   'q': 0.0},
-        {'xi': 2.0, 'dv*EI': '0',  'dφ*EI': '0',    'dM': '0', 'dQ': '-6',  'q': 4.0},
-        {'xi': 4.0, 'dv*EI': '0',  'dφ*EI': '!',    'dM': '0', 'dQ': '0',   'q': 4.0},
+        {'xi': '0', 'dv*EI': '0',  'dφ*EI': '!',    'dM': '0', 'dQ': '!',   'q': '0'},
+        {'xi': '2', 'dv*EI': '0',  'dφ*EI': '0',    'dM': '0', 'dQ': '-6',  'q': '4'},
+        {'xi': '4', 'dv*EI': '0',  'dφ*EI': '!',    'dM': '0', 'dQ': '0',   'q': '4'},
         ])
 
 column_conf = {
-        'xi': st.column_config.NumberColumn('xi', help='Координата начала участка', format='%.2f', required=True, default=0.0),
+        'xi': st.column_config.TextColumn('xi', help='Координата начала участка', format='%.2f', required=True, default=0.0),
         'dv*EI': st.column_config.TextColumn('dv*EI', help='Дополнительный прогиб в начале участка', required=True, default=0),
         'dφ*EI': st.column_config.TextColumn('dφ*EI', help='Дополнительный угол поворота в начале участка', required=True, default=0),
         'dM': st.column_config.TextColumn('dM', help='Дополнительный момент в начале участка', required=True, default=0),
         'dQ': st.column_config.TextColumn('dQ', help='Дополнительная сосредоточенная сила в начале участка', required=True, default=0),
-        'q': st.column_config.NumberColumn('q', help='Интенсивность распределенной нагрузки на участке', format='%.1f', required=True, default=0),
+        'q': st.column_config.TextColumn('q', help='Интенсивность распределенной нагрузки на участке', format='%.1f', required=True, default=0),
         }
-st.write('Для решения и построения графиков введите в таблицу ниже значения начальных параметров для каждого из участков балки, а также общую длину балки в поле под таблицей. На место неизвестных начальных параметров впишите !')
+st.write('''Для решения и построения графиков введите в таблицу ниже значения начальных параметров
+ для каждого из участков балки, а также общую длину балки в поле под таблицей.
+ На место неизвестных начальных параметров впишите !. Для десятичных значений лучше вводить дробь, например, 2.5=25/10''')
 data = st.data_editor(init_data, hide_index=False, use_container_width=True, num_rows='dynamic', column_config=column_conf)
 L = st.number_input(label=r'Полная длина балки', value=6.0, min_value=1.0)
 
