@@ -19,12 +19,12 @@ init_data = pd.DataFrame([
         ])
 
 column_conf = {
-        'xi': st.column_config.TextColumn('xi', help='Координата начала участка', format='%.2f', required=True, default='0'),
+        'xi': st.column_config.TextColumn('xi', help='Координата начала участка', required=True, default='0'),
         'dv*EI': st.column_config.TextColumn('dv*EI', help='Дополнительный прогиб в начале участка', required=True, default='0'),
         'dφ*EI': st.column_config.TextColumn('dφ*EI', help='Дополнительный угол поворота в начале участка', required=True, default='0'),
         'dM': st.column_config.TextColumn('dM', help='Дополнительный момент в начале участка', required=True, default='0'),
         'dQ': st.column_config.TextColumn('dQ', help='Дополнительная сосредоточенная сила в начале участка', required=True, default='0'),
-        'q': st.column_config.TextColumn('q', help='Интенсивность распределенной нагрузки на участке', format='%.1f', required=True, default='0'),
+        'q': st.column_config.TextColumn('q', help='Интенсивность распределенной нагрузки на участке', required=True, default='0'),
         }
 st.write('''Для решения и построения графиков введите в таблицу ниже значения начальных параметров
  для каждого из участков балки, а также общую длину балки в поле под таблицей.
