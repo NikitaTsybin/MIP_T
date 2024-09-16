@@ -7,10 +7,54 @@ from plotly.subplots import make_subplots
 from math import factorial
 import pandas as pd
 import sympy.printing as printing
+from PIL import Image
+from streamlit_drawable_canvas import st_canvas
 
 
-st.write('Ниже записано общее решение уравнения изгиба балки с применением метода начальных параметров')
-st.write('''$EI \\cdot v_i(x) = EI \\cdot v_{i-1}(x) + EI \\cdot \\Delta v_{i-1} + EI \\cdot \\Delta \\varphi \\cdot (x - x_i) - \\dfrac{\\Delta M \\cdot (x - x_i)^2}{2!} - \\dfrac{\\Delta Q \\cdot (x - x_i)^3}{3!} +  \\dfrac{(q_i - q_{i-1}) \\cdot (x - x_i)^4}{4!} $''')
+# Specify canvas parameters in application
+##drawing_mode = st.sidebar.selectbox(
+##    "Drawing tool:", ("point", "freedraw", "line", "rect", "circle", "transform")
+##)
+
+##stroke_width = st.sidebar.slider("Stroke width: ", 1, 25, 3)
+##if drawing_mode == 'point':
+##    point_display_radius = st.sidebar.slider("Point display radius: ", 1, 25, 3)
+##stroke_color = st.sidebar.color_picker("Stroke color hex: ")
+##st.write(stroke_color)
+##bg_color = st.sidebar.color_picker("Background color hex: ", "#eee")
+##bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
+
+##realtime_update = st.sidebar.checkbox("Update in realtime", True)
+
+
+# Create a canvas component
+canvas_result = st_canvas(
+    fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
+    stroke_width=3,
+    stroke_color='#000000',
+    background_color="#eee",
+##    background_image=Image.open(bg_image) if bg_image else None,
+    update_streamlit=False,
+    height=200,
+    drawing_mode="freedraw",
+    point_display_radius=0,
+    key="canvas",
+)
+
+
+with st.expander('Общий вид решения'):
+    st.write('Ниже записано общее решение уравнения изгиба балки с применением метода начальных параметров')
+    st.write('''$EI \\cdot v_i(x) = EI \\cdot v_{i-1}(x) + EI \\cdot \\Delta v_{i-1} +
+    EI \\cdot \\Delta \\varphi_i \\cdot (x - x_i) - \\dfrac{\\Delta M_i \\cdot (x - x_i)^2}{2!} -
+    \\dfrac{\\Delta Q_i \\cdot (x - x_i)^3}{3!} +  \\dfrac{(q_i - q_{i-1}) \\cdot (x - x_i)^4}{4!}; $''')
+
+    st.write('''$EI \\cdot \\varphi_i(x) = EI \\cdot \\varphi_{i-1}(x) +
+    EI \\cdot \\Delta \\varphi_i - \\Delta M_i \\cdot (x - x_i) -
+    \\dfrac{\\Delta Q_i \\cdot (x - x_i)^2}{2!} +  \\dfrac{(q_i - q_{i-1}) \\cdot (x - x_i)^3}{3!}; $''')
+
+    st.write('''$M_i(x) = M_{i-1}(x) + \\Delta M_i + \\Delta Q_i \\cdot (x - x_i) - \\dfrac{(q_i - q_{i-1}) \\cdot (x - x_i)^2}{2!}; $''')
+
+    st.write('''$Q_i(x) = Q_{i-1}(x) + \\Delta Q_i - (q_i - q_{i-1}) \\cdot (x - x_i).$''')
 
 init_data = pd.DataFrame([
         {'xi': '0', 'dv*EI': '0',  'dφ*EI': '!',    'dM': '0', 'dQ': '!',   'q': '0'},
@@ -20,11 +64,11 @@ init_data = pd.DataFrame([
 
 column_conf = {
         'xi': st.column_config.TextColumn('xi', help='Координата начала участка', required=True, default='0'),
-        'dv*EI': st.column_config.TextColumn('dv*EI', help='Дополнительный прогиб в начале участка', required=True, default='0'),
-        'dφ*EI': st.column_config.TextColumn('dφ*EI', help='Дополнительный угол поворота в начале участка', required=True, default='0'),
-        'dM': st.column_config.TextColumn('dM', help='Дополнительный момент в начале участка', required=True, default='0'),
-        'dQ': st.column_config.TextColumn('dQ', help='Дополнительная сосредоточенная сила в начале участка', required=True, default='0'),
-        'q': st.column_config.TextColumn('q', help='Интенсивность распределенной нагрузки на участке', required=True, default='0'),
+        'dv*EI': st.column_config.TextColumn('dvi*EI', help='Дополнительный прогиб в начале участка', required=True, default='0'),
+        'dφ*EI': st.column_config.TextColumn('dφi*EI', help='Дополнительный угол поворота в начале участка', required=True, default='0'),
+        'dM': st.column_config.TextColumn('dMi', help='Дополнительный момент в начале участка', required=True, default='0'),
+        'dQ': st.column_config.TextColumn('dQi', help='Дополнительная сосредоточенная сила в начале участка', required=True, default='0'),
+        'q': st.column_config.TextColumn('qi', help='Интенсивность распределенной нагрузки на участке', required=True, default='0'),
         }
 st.write('''Для решения и построения графиков введите в таблицу ниже значения начальных параметров
  для каждого из участков балки, а также общую длину балки в поле под таблицей.
@@ -43,26 +87,6 @@ EIdf_val = data['dφ*EI'].tolist()
 dM_val = data['dM'].tolist()
 dQ_val = data['dQ'].tolist()
 q_val = data['q'].tolist()
-
-###Известные значения начальных параметров
-###Эти данные должны считываться из таблицы
-###Рассматривается балка из трех участков. Координаты начала каждого из участков
-##x_val = [0, 2, 4]
-###Число участков
-##num_elems = len(x_val)
-###Общая длина
-##L_beam = 6
-##x_val.append(L_beam)
-###В балке нет параллелограмных механизмов, а вначале первого участка шарнирная опора (перемещение равно нулю)
-##EIdv_val = [0, 0, 0]
-###В начале первого участка шарнир, поэтому неизвестен угол поворота. В начале третьего участка врезанный шарнир, также неизвестен угол
-##EIdf_val = ['!', 0, '!']
-###В начале балки шарнир (момент равен нулю), сосредоточенных моментов в началах участка 2 и 3 нет
-##dM_val = [0, 0, 0]
-###В начале первого участка шарнирная опора, реакция неизвестна. В начале второго участка сосредоточенная сила
-##dQ_val = ['!', -6, 0]
-###Распределенные нагрузки на втором и третьем участке
-##q_val = [0, 4, 4]
 
 #Генерация переменных
 x = symbols('x', real=True)
@@ -275,4 +299,12 @@ def draw_plots():
 
 
 st.plotly_chart(draw_plots())
+
+        
+
+
+
+
+
+
 
