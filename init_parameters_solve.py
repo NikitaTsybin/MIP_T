@@ -285,6 +285,17 @@ for i in range(num_elems):
 def draw_plots():
     fig = make_subplots(rows = 2,cols = 2, subplot_titles=['Перемещения v*EI', 'Углы поворота φ*EI', 'Момент Mz', 'Поперечная сила Qy'])
     for i in range(num_elems):
+        for ii in x_val:
+            for j in [1,2]:
+                for k in [1,2]:
+                    fig.add_vline(
+                    x=float((sympify(ii)).evalf()),
+                    line_width=1,
+                    line_dash="solid",
+                    line_color='red',
+                    row=j,
+                    col=k,
+                    )
         fig.add_trace(go.Scatter(x=points[i], y=v[i], showlegend=False, line=dict(color = "LightSkyBlue"), fill='tozeroy'), row = 1, col = 1)
         fig.add_trace(go.Scatter(x=points[i], y=f[i], showlegend=False, line=dict(color = "LightSkyBlue"), fill='tozeroy'), row = 1, col = 2)
         fig.add_trace(go.Scatter(x=points[i], y=M[i], showlegend=False, line=dict(color = "LightSkyBlue"), fill='tozeroy'), row = 2, col = 1)
