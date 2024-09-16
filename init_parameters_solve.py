@@ -36,6 +36,7 @@ canvas_result = st_canvas(
 ##    background_image=Image.open(bg_image) if bg_image else None,
     update_streamlit=False,
     height=200,
+    width = 700,
     drawing_mode="freedraw",
     point_display_radius=0,
     key="canvas",
